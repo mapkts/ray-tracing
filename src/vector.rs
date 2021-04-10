@@ -1,4 +1,8 @@
-//! 3D Vector types, such as [`Point`] and [`Color`].
+//! 3D Vector types, such as [`Vec3`], [`Point`] and [`Color`].
+#![allow(non_snake_case)]
+use crate::error::{ErrorKind, Result};
+use std::fmt;
+use std::io;
 use std::ops::*;
 
 /// Types that can be served as scalar values in vector space.
@@ -144,10 +148,10 @@ macro_rules! binop_impls {
 /// - 2nd arg should be the type of the vector's elements.
 ///
 /// ```ignore
-/// struct Point3(f32, f32, f32);
+/// struct $vector3(f32, f32, f32);
 ///
-/// // `Point3D` type must implement `Vector3d` trait beforehead.
-/// vector_binop_impls!(Point3, f32);
+/// // `$vector3D` type must implement `Vector3d` trait beforehead.
+/// vector_binop_impls!($vector3, f32);
 /// ```
 #[macro_export]
 macro_rules! vector_binop_impls {
@@ -202,6 +206,12 @@ pub struct Color {
     pub b: f32,
 }
 
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {} {}", self.r, self.g, self.b)
+    }
+}
+
 impl From<Color> for (f32, f32, f32) {
     fn from(color: Color) -> (f32, f32, f32) {
         (color.r, color.g, color.b)
@@ -225,40 +235,82 @@ impl Vector3d<f32> for Color {
 }
 vector_binop_impls!(Color, f32);
 
-///////////////////////////////////////////////////////////////
-// => Point
-///////////////////////////////////////////////////////////////
+impl Color {
+    pub fn write<W: io::Write + fmt::Debug>(
+        self,
+        stream: &mut W,
+        samples_per_pixel: i32,
+    ) -> Result<()> {
+        let (mut r, mut g, mut b) = self.into();
 
-/// 3D spatial coordinates.
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
-pub struct Point {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
+        let scale = 1.0 / samples_per_pixel as f32;
+        r = (r * scale).sqrt();
+        g = (g * scale).sqrt();
+        b = (b * scale).sqrt();
 
-impl From<Point> for (f32, f32, f32) {
-    fn from(point: Point) -> (f32, f32, f32) {
-        (point.x, point.y, point.z)
+        writeln!(
+            stream,
+            "{} {} {}",
+            ((r * 256.0) as u8).clamp(0, u8::MAX),
+            ((g * 256.0) as u8).clamp(0, u8::MAX),
+            ((b * 256.0) as u8).clamp(0, u8::MAX),
+        )
+        .map_err(|_| ErrorKind::WriteColor(format!("{:?}", stream)))
     }
 }
 
-impl From<(f32, f32, f32)> for Point {
-    fn from(tuple: (f32, f32, f32)) -> Point {
-        Point {
-            x: tuple.0,
-            y: tuple.1,
-            z: tuple.2,
+///////////////////////////////////////////////////////////////
+// => Point and Vec3
+///////////////////////////////////////////////////////////////
+
+macro_rules! vector_type {
+    ($(#[$doc:meta])* $vector:ident) => {
+        $(#[$doc])*
+        #[derive(Copy, Clone, Debug, Default, PartialEq)]
+        pub struct $vector {
+            pub x: f32,
+            pub y: f32,
+            pub z: f32,
         }
-    }
+
+        impl fmt::Display for $vector {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "{} {} {}", self.x, self.y, self.z)
+            }
+        }
+
+        impl From<$vector> for (f32, f32, f32) {
+            fn from($vector: $vector) -> (f32, f32, f32) {
+                ($vector.x, $vector.y, $vector.z)
+            }
+        }
+
+        impl From<(f32, f32, f32)> for $vector {
+            fn from(tuple: (f32, f32, f32)) -> $vector {
+                $vector {
+                    x: tuple.0,
+                    y: tuple.1,
+                    z: tuple.2,
+                }
+            }
+        }
+
+        impl Vector3d<f32> for $vector {
+            fn length(self) -> f32 {
+                self.squared_length().sqrt()
+            }
+        }
+        vector_binop_impls!($vector, f32);
+    };
 }
 
-impl Vector3d<f32> for Point {
-    fn length(self) -> f32 {
-        self.squared_length().sqrt()
-    }
-}
-vector_binop_impls!(Point, f32);
+vector_type!(
+    /// Vectors in the 3D spatial space.
+    Vec3
+);
+
+/// Points in the 3D spatial space.
+pub type Point = Vec3;
 
 #[cfg(test)]
 mod tests {
