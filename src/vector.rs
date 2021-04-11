@@ -160,13 +160,15 @@ macro_rules! vector_binop_impls {
         binop_impls!(
             op_vector, $vector, $scalar,
             Add, add, +,
-            Sub, sub, -
+            Sub, sub, -,
+            Mul, mul, *
         );
 
         binop_impls!(
             op_assgin_vector, $vector, $scalar,
             AddAssign, add_assign, +=,
-            SubAssign, sub_assign, -=
+            SubAssign, sub_assign, -=,
+            MulAssign, mul_assign, *=
         );
 
 
@@ -236,6 +238,10 @@ impl Vector3d<f32> for Color {
 vector_binop_impls!(Color, f32);
 
 impl Color {
+    pub fn new(r: f32, g: f32, b: f32) -> Self {
+        Color { r, g, b }
+    }
+
     pub fn write<W: io::Write + fmt::Debug>(
         self,
         stream: &mut W,
@@ -271,6 +277,12 @@ macro_rules! vector_type {
             pub x: f32,
             pub y: f32,
             pub z: f32,
+        }
+
+        impl $vector {
+            pub fn new(x: f32, y: f32, z: f32) -> Self {
+                $vector { x, y, z }
+            }
         }
 
         impl fmt::Display for $vector {
