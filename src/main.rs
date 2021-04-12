@@ -6,8 +6,11 @@ use ray_tracing::sphere;
 use ray_tracing::vector::*;
 
 fn ray_color(ray: &Ray) -> Color {
-    if sphere::hit_sphere(Point::new(0.0, 0.0, -1.0), 0.5, &ray) {
-        return (1.0, 0.0, 0.0).into();
+    let t = sphere::hit_sphere(Point::new(0.0, 0.0, -1.0), 0.5, &ray);
+
+    if t > 0.0 {
+        let normal = (ray.at(t) - (0.0, 0.0, -1.0).into()).normalize();
+        return 0.5 * Color::new(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0);
     }
 
     let unit_direction = ray.direction.normalize();
