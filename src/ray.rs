@@ -1,5 +1,5 @@
 //! The [`Ray`] type. We can't live without it.
-use crate::vector::{Point, Vec3};
+use crate::vec::{Point, Vec3};
 
 /// Rays in the 3D space.
 #[derive(Debug, Clone, Copy)]

@@ -1,11 +1,12 @@
-use crate::ray::*;
-use crate::vector::*;
+//! 3D hittable [`Sphere`]s.
 use crate::hittable::{HitRecord, Hittable};
+use crate::ray::*;
+use crate::vec::*;
 
 #[derive(Debug, Default)]
 pub struct Sphere {
     pub center: Point,
-    pub radius: f32
+    pub radius: f32,
 }
 
 impl Sphere {
@@ -39,8 +40,8 @@ impl Hittable for Sphere {
 
         let t = root;
         let p = ray.at(root);
-        let normal = (p - self.center) / self.radius;
-        let record = HitRecord::new(p, t, normal);
+        let outward_normal = (p - self.center) / self.radius;
+        let record = HitRecord::new(p, t, outward_normal);
 
         return Some(record);
     }
@@ -59,7 +60,6 @@ pub fn hit_sphere(center: Point, radius: f32, ray: &Ray) -> f32 {
         return (-half_b - discriminant.sqrt()) / a;
     }
 }
-
 
 // /// Checks if a ray hit a sphere.
 // pub fn hit_sphere(center: Point, radius: f32, ray: &Ray) -> f32 {

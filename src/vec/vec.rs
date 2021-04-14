@@ -148,10 +148,10 @@ macro_rules! binop_impls {
 /// - 2nd arg should be the type of the vector's elements.
 ///
 /// ```ignore
-/// struct $vector3(f32, f32, f32);
+/// struct Vec3(f32, f32, f32);
 ///
 /// // `$vector3D` type must implement `Vector3d` trait beforehead.
-/// vector_binop_impls!($vector3, f32);
+/// vector_binop_impls!(Vec3, f32);
 /// ```
 #[macro_export]
 macro_rules! vector_binop_impls {
