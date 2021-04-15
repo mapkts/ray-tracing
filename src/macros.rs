@@ -1,4 +1,5 @@
 //! Macro definitions.
+#[allow(unused)]
 use crate::prelude::{Point3, Rgb, Vec3};
 
 /// A convenient macro to generate Vec3<f64>.

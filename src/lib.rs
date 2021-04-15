@@ -11,4 +11,4 @@ pub mod util;
 pub mod vec;
 
 #[macro_use]
-pub mod macros;
+mod macros;

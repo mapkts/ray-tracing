@@ -3,6 +3,7 @@
 pub mod raw;
 
 use self::raw::*;
+use crate::util::*;
 use std::fmt;
 use std::ops::*;
 
@@ -51,3 +52,45 @@ pub type Vec3 = Vec3d<f64>;
 
 /// Represents points in the 3D spatial space.
 pub type Point3 = Vec3d<f64>;
+
+impl Vec3 {
+    #[inline]
+    pub fn random(rng: &mut impl rand::Rng) -> Self {
+        Vec3::new(rng.gen(), rng.gen(), rng.gen())
+    }
+
+    #[inline]
+    pub fn random_within(rng: &mut impl rand::Rng, range: Range<f64>) -> Self {
+        Vec3::new(
+            rng.gen_range(range.clone()),
+            rng.gen_range(range.clone()),
+            rng.gen_range(range),
+        )
+    }
+
+    pub fn random_in_unit_sphere(rng: &mut impl rand::Rng) -> Self {
+        // Reject all points that are outside the unit sphere until catch a point inside the unit 
+        // sphere.
+        loop {
+            let p = Self::random_within(rng, -1.0..1.0);
+            if p.len_squared() < 1.0 {
+                return p
+            }
+        }
+    }
+
+    pub fn random_in_unit_hemisphere(rng: &mut impl rand::Rng, normal: Vec3) -> Self {
+        let in_unit_sphere = Self::random_in_unit_sphere(rng);
+        if in_unit_sphere.dot(normal) > 0.0 {
+            in_unit_sphere
+        } else {
+            -in_unit_sphere
+        }
+    }
+
+    pub fn random_unit_vector() -> Self {
+        // TODO: Cache thread rng intead of calling this every time.
+        let mut rng = rand::thread_rng();
+        Self::random_in_unit_sphere(&mut rng).normal()
+    }
+}
