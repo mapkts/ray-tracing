@@ -1,7 +1,7 @@
 //! Definition of constants.
-pub const INIFINTY: f32 = f32::INFINITY;
-pub const PI: f32 = std::f32::consts::PI;
+pub const INIFINTY: f64 = f64::INFINITY;
+pub const PI: f64 = std::f64::consts::PI;
 
-pub fn degrees_to_radians(degrees: f32) -> f32 {
+pub fn degrees_to_radians(degrees: f64) -> f64 {
     return degrees * PI / 180.0
 }
