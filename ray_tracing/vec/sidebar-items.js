@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["raw","Generic raw vector types."]],"struct":[["Color","RGB color data."],["Vec3d","A 3D generic vector type."]],"type":[["Point3","Represents points in the 3D spatial space."],["Vec3","Represents vectors in the 3D spatial space."]]});

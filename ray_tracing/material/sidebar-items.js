@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Lambertian",""],["Metal",""]],"trait":[["Material",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ErrorKind","The concrete type of an error."]],"type":[["Result","A type alias for `Result`<T, [`enum@ErrorKind`]>."]]});

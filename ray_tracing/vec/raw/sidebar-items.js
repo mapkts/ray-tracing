@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Vec2d","A 2D spatial vector type."],["Vec3d","A 3D spatial vector type."],["Vec4d","A 4D spatial vector type."]],"trait":[["Scalar","Types that can be served as scalar values in vector space."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Ray","Rays in the 3D space."]]});

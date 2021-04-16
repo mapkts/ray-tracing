@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["Rgb","RGB color data."]]});
