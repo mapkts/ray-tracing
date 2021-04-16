@@ -3,7 +3,6 @@
 pub mod raw;
 
 use self::raw::*;
-use crate::util::*;
 use std::fmt;
 use std::ops::*;
 
@@ -92,5 +91,15 @@ impl Vec3 {
         // TODO: Cache thread rng intead of calling this every time.
         let mut rng = rand::thread_rng();
         Self::random_in_unit_sphere(&mut rng).normal()
+    }
+
+    /// Checks if the vector is close to zero in all dimensions.
+    pub fn near_zero(&self) -> bool {
+        const S: f64 = 1.0e-8;
+        self.x.abs() < S && self.y.abs() < S && self.z.abs() < S
+    }
+
+    pub fn reflect(self, normal: Vec3) -> Vec3 {
+        self - 2.0 * self.dot(normal) * normal
     }
 }

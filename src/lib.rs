@@ -9,6 +9,7 @@ pub mod ray;
 pub mod sphere;
 pub mod util;
 pub mod vec;
+pub mod material;
 
 #[macro_use]
 mod macros;

@@ -1,23 +1,25 @@
 #[macro_use]
 extern crate ray_tracing;
 
+use ray_tracing::material::*;
 use ray_tracing::prelude::*;
-use ray_tracing::hittable::*;
 use ray_tracing::util::*;
-use ray_tracing::sphere::Sphere;
 use std::io;
 use std::io::prelude::*;
 
 fn ray_color(ray: &Ray, world: &impl Hittable, depth: u32) -> Rgb {
+    // Gathers no more light if we exceeded the ray bounce limit.
+    if depth <= 0 {
+        return rgb!(0, 0, 0);
+    }
+
     // 0.001 here is for fixing shadow acne.
     if let Some(rec) = world.hit(ray, 0.001, INIFINTY) {
-        // Gathers no more light if we exceeded the ray bounce limit.
-        if depth <= 0 {
-            return rgb!(0, 0, 0);
+        if let Some((attenuation, scattered)) = rec.material.as_ref().unwrap().scatter(&ray, &rec) {
+            return attenuation * ray_color(&scattered, world, depth - 1)
+        } else {
+            return Rgb::default()
         }
-
-        let target = rec.p + rec.normal + Vec3::random_unit_vector();
-        return 0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1);
     } else {
         let unit_direction = ray.direction.normal();
 
@@ -63,18 +65,25 @@ fn main() {
 
     // World
     let mut world = HittableList::new();
-    world.add(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
-    world.add(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0));
+    let material_ground = Lambertian::new(rgb!(0.8, 0.8, 0.0));
+    let material_center = Lambertian::new(rgb!(0.7, 0.3, 0.3));
+    let material_left = Metal::new(rgb!(0.8, 0.8, 0.8), 0.3);
+    let material_right = Metal::new(rgb!(0.8, 0.8, 0.8), 1.0);
+
+    world.add(Sphere::new(v3!(0.0, -100.5, -1.0), 100.0, material_ground));
+    world.add(Sphere::new(v3!(0.0, 0.0, -1.0), 0.5, material_center));
+    world.add(Sphere::new(v3!(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(Sphere::new(v3!(1.0, 0.0, -1.0), 0.5, material_right));
 
     // Camera
-    let camera = Camera::default();    
+    let camera = Camera::default();
 
     // Render
     stdout!("P3\n{} {}\n255\n", image_width, image_height);
 
     for h in (0..image_height).rev() {
         // Prints how many scanlines left.
-        stderr!("\rScanlines remaining: {}  ", h);
+        stderr!("\rScanlines remaining: {:<5}", h);
 
         for w in 0..image_width {
             let mut pixel_color = Rgb::default();

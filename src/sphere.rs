@@ -6,11 +6,16 @@ use crate::prelude::*;
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
+    pub material: Option<Box<dyn Material>>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Sphere { center, radius }
+    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Self {
+        Sphere {
+            center,
+            radius,
+            material: Some(Box::new(material)),
+        }
     }
 }
 
@@ -40,7 +45,8 @@ impl Hittable for Sphere {
         let t = root;
         let p = ray.at(root);
         let outward_normal = (p - self.center) / self.radius;
-        let record = HitRecord::new(p, t, outward_normal);
+        let mut record = HitRecord::new(p, t, self.material.as_ref().map(Box::as_ref));
+        record.set_face_normal(ray, outward_normal);
 
         return Some(record);
     }

@@ -13,3 +13,6 @@ pub use crate::error::{ErrorKind, Result};
 pub use crate::ray::Ray;
 pub use crate::vec::raw::Scalar;
 pub use crate::vec::{Point3, Vec3};
+pub use crate::hittable::*;
+pub use crate::sphere::Sphere;
+pub use crate::material::Material;

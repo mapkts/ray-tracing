@@ -8,19 +8,21 @@ pub trait Hittable {
 
 /// A record that contains the information of a hit.
 #[derive(Debug)]
-pub struct HitRecord {
+pub struct HitRecord<'world> {
     pub p: Point3,
     pub t: f64,
     pub normal: Vec3,
+    pub material: Option<&'world dyn Material>,
     pub front_face: bool,
 }
 
-impl HitRecord {
-    pub fn new(p: Point3, t: f64, normal: Vec3) -> Self {
+impl<'world> HitRecord<'world> {
+    pub fn new(p: Point3, t: f64, material: Option<&'world dyn Material>) -> Self {
         HitRecord {
             p,
             t,
-            normal,
+            normal: p,
+            material,
             front_face: false,
         }
     }
